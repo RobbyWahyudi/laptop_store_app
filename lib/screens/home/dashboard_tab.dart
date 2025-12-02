@@ -7,6 +7,7 @@ import '../../services/analytics_service.dart';
 import '../../utils/currency_formatter.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/empty_state.dart';
+import '../../screens/cart/cart_screen.dart';
 
 class DashboardTab extends StatefulWidget {
   const DashboardTab({super.key});
@@ -18,7 +19,6 @@ class DashboardTab extends StatefulWidget {
 class _DashboardTabState extends State<DashboardTab> {
   late AnalyticsService _analyticsService;
   DashboardStats? _stats;
-  List<BestSeller> _bestSellers = [];
   bool _isLoading = false;
   String? _error;
 
@@ -32,6 +32,18 @@ class _DashboardTabState extends State<DashboardTab> {
     }
   }
 
+  Future<void> _openCart() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CartScreen()),
+    );
+
+    // Refresh dashboard if transaction was completed
+    if (result == true) {
+      _loadDashboardData();
+    }
+  }
+
   Future<void> _loadDashboardData() async {
     setState(() {
       _isLoading = true;
@@ -40,11 +52,9 @@ class _DashboardTabState extends State<DashboardTab> {
 
     try {
       final stats = await _analyticsService.getDashboardStats();
-      final bestSellers = await _analyticsService.getBestSellers(limit: 5);
 
       setState(() {
         _stats = stats;
-        _bestSellers = bestSellers;
         _isLoading = false;
       });
     } catch (e) {
@@ -89,6 +99,34 @@ class _DashboardTabState extends State<DashboardTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header with refresh button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Dashboard',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: _loadDashboardData,
+                      icon: const Icon(Icons.refresh),
+                      tooltip: 'Refresh Dashboard',
+                    ),
+                    IconButton(
+                      onPressed: _openCart,
+                      icon: const Icon(Icons.shopping_cart),
+                      tooltip: 'Open Cart',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
             // Stats Grid
             GridView.count(
               padding: EdgeInsets.zero,
@@ -97,31 +135,31 @@ class _DashboardTabState extends State<DashboardTab> {
               physics: const NeverScrollableScrollPhysics(),
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: 1.2,
+              childAspectRatio: 1.4,
               children: [
                 StatCard(
                   title: "Today's Sales",
-                  value: CurrencyFormatter.format(_stats!.todaySales),
+                  value: CurrencyFormatter.format(_stats!.today.totalSales),
                   icon: Icons.attach_money,
                   iconColor: AppTheme.black,
                 ),
                 StatCard(
                   title: "Today's Transactions",
-                  value: _stats!.todayTransactions.toString(),
+                  value: _stats!.today.totalTransactions.toString(),
                   icon: Icons.receipt_long,
                   iconColor: AppTheme.grey700,
                 ),
                 StatCard(
                   title: 'Low Stock Items',
-                  value: _stats!.lowStockProducts.toString(),
+                  value: _stats!.lowStock.totalAlerts.toString(),
                   icon: Icons.warning_amber,
-                  iconColor: _stats!.lowStockProducts > 0
+                  iconColor: _stats!.lowStock.totalAlerts > 0
                       ? AppTheme.grey800
                       : AppTheme.grey500,
                 ),
                 StatCard(
                   title: 'Monthly Revenue',
-                  value: CurrencyFormatter.format(_stats!.monthlyRevenue),
+                  value: CurrencyFormatter.format(_stats!.thisMonth.totalSales),
                   icon: Icons.trending_up,
                   iconColor: AppTheme.black,
                 ),
@@ -147,36 +185,38 @@ class _DashboardTabState extends State<DashboardTab> {
             ),
             const SizedBox(height: 12),
 
-            if (_bestSellers.isEmpty)
+            if (_stats!.topProducts.isEmpty)
               const EmptyState(
                 icon: Icons.inventory_outlined,
                 title: 'No Best Sellers',
                 subtitle: 'Sales data will appear here',
               )
             else
-              ..._bestSellers.map((seller) => _buildBestSellerCard(seller)),
+              ..._stats!.topProducts.map(
+                (product) => _buildTopProductCard(product),
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBestSellerCard(BestSeller seller) {
+  Widget _buildTopProductCard(TopProduct product) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: AppTheme.grey100,
           child: Icon(
-            seller.productType == 'laptop'
+            product.productType == 'laptop'
                 ? Icons.laptop_mac
                 : Icons.inventory_2,
             color: AppTheme.black,
           ),
         ),
-        title: Text(seller.productName),
+        title: Text(product.details.name),
         subtitle: Text(
-          '${seller.totalSold} sold • ${seller.productType}',
+          '${product.totalQty} sold • ${product.productType}',
           style: Theme.of(context).textTheme.bodySmall,
         ),
         trailing: Column(
@@ -184,7 +224,7 @@ class _DashboardTabState extends State<DashboardTab> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              CurrencyFormatter.format(seller.totalRevenue),
+              CurrencyFormatter.format(product.totalRevenue),
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),

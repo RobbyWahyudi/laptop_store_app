@@ -15,8 +15,8 @@ class AnalyticsService {
   Future<DashboardStats> getDashboardStats() async {
     final response = await _apiService.get(ApiConfig.dashboard);
 
-    if (response['success'] == true && response['data'] != null) {
-      return DashboardStats.fromJson(response['data']);
+    if (response['success'] == true) {
+      return DashboardStats.fromJson(response);
     }
     throw Exception('Failed to load dashboard stats');
   }
