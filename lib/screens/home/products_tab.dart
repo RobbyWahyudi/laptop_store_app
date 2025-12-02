@@ -51,16 +51,29 @@ class _ProductsTabState extends State<ProductsTab> {
   Future<void> _loadProducts() async {
     setState(() => _isLoading = true);
     try {
+      print(
+        'Loading products with type: ${_selectedType == 'all' ? null : _selectedType}',
+      );
       final products = await _productService.getProducts(
         type: _selectedType == 'all' ? null : _selectedType,
       );
+      print('Loaded ${products.length} products');
+      for (var product in products) {
+        print('Product: ${product.name}, Type: ${product.type}');
+        if (product is Laptop) {
+          print('  Laptop specs: ${product.specs}');
+        }
+      }
       setState(() {
         _products = products;
         _filteredProducts = products;
         _isLoading = false;
       });
-    } catch (e) {
+      print('State updated with ${_filteredProducts.length} filtered products');
+    } catch (e, stackTrace) {
       setState(() => _isLoading = false);
+      print('Error loading products: $e');
+      print('Stack trace: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -70,9 +83,12 @@ class _ProductsTabState extends State<ProductsTab> {
   }
 
   void _filterProducts(String query) {
+    print('Filtering products with query: "$query"');
+    print('Total products: ${_products.length}');
     setState(() {
       if (query.isEmpty) {
         _filteredProducts = _products;
+        print('Showing all products: ${_filteredProducts.length}');
       } else {
         _filteredProducts = _products
             .where(
@@ -80,6 +96,7 @@ class _ProductsTabState extends State<ProductsTab> {
                   product.name.toLowerCase().contains(query.toLowerCase()),
             )
             .toList();
+        print('Filtered products: ${_filteredProducts.length}');
       }
     });
   }

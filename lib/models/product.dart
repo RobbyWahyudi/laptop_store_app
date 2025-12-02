@@ -69,6 +69,28 @@ class Laptop extends Product {
   final double? weight;
   final String? operatingSystem;
 
+  // Helper methods to parse display information
+  static double _parseScreenSize(String? display) {
+    if (display == null) return 0.0;
+
+    // Extract screen size from display string (e.g., "15.6" 144Hz" -> 15.6)
+    final RegExp regex = RegExp(r'(\d+\.?\d*)"');
+    final Match? match = regex.firstMatch(display);
+    if (match != null) {
+      return double.tryParse(match.group(1) ?? '0') ?? 0.0;
+    }
+    return 0.0;
+  }
+
+  static String? _parseRefreshRate(String? display) {
+    if (display == null) return null;
+
+    // Extract refresh rate from display string (e.g., "15.6" 144Hz" -> "144Hz")
+    final RegExp regex = RegExp(r'(\d+Hz)');
+    final Match? match = regex.firstMatch(display);
+    return match?.group(1);
+  }
+
   Laptop({
     required super.id,
     required super.name,
@@ -97,19 +119,25 @@ class Laptop extends Product {
       description: json['description'],
       price: (json['price'] ?? 0).toDouble(),
       stock: json['stock'] ?? 0,
-      category: json['category_name'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      category: json['laptop_categories'] != null
+          ? json['laptop_categories']['name']
+          : json['category_name'],
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : DateTime.now(),
       brand: json['brand'] ?? '',
-      processor: json['processor'] ?? '',
-      ramGb: json['ram_gb'] ?? 0,
+      processor: json['cpu'] ?? '',
+      ramGb: json['ram'] ?? 0,
       storage: json['storage'] ?? '',
       gpu: json['gpu'],
-      screenSize: (json['screen_size'] ?? 0).toDouble(),
-      screenResolution: json['screen_resolution'],
-      refreshRate: json['refresh_rate'],
+      screenSize: _parseScreenSize(json['display']),
+      screenResolution: json['display'],
+      refreshRate: _parseRefreshRate(json['display']),
       weight: json['weight'] != null ? (json['weight']).toDouble() : null,
-      operatingSystem: json['operating_system'],
+      operatingSystem: json['os'],
     );
   }
 
@@ -118,15 +146,14 @@ class Laptop extends Product {
     final json = super.toJson();
     json.addAll({
       'brand': brand,
-      'processor': processor,
-      'ram_gb': ramGb,
+      'cpu': processor,
+      'ram': ramGb,
       'storage': storage,
       'gpu': gpu,
-      'screen_size': screenSize,
-      'screen_resolution': screenResolution,
-      'refresh_rate': refreshRate,
+      'display':
+          screenResolution, // Using screenResolution as it contains the full display string
       'weight': weight,
-      'operating_system': operatingSystem,
+      'os': operatingSystem,
     });
     return json;
   }
@@ -158,9 +185,17 @@ class Accessory extends Product {
       description: json['description'],
       price: (json['price'] ?? 0).toDouble(),
       stock: json['stock'] ?? 0,
-      category: json['category'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      category:
+          json['category'] ??
+          (json['laptop_categories'] != null
+              ? json['laptop_categories']['name']
+              : null),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : DateTime.now(),
       accessoryType: json['accessory_type'] ?? '',
     );
   }
