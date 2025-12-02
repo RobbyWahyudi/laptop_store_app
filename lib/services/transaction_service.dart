@@ -57,14 +57,20 @@ class TransactionService {
 
   /// Create transaction
   Future<Transaction> createTransaction({
+    required String customerName,
     required String paymentMethod,
     required List<Map<String, dynamic>> items,
   }) async {
     final response = await _apiService.post(
       ApiConfig.transactions,
       body: {
+        'customer_name': customerName,
         'payment_method': paymentMethod,
         'items': items,
+        'total_price': items.fold(
+          0.0,
+          (sum, item) => sum + (item['price'] * item['qty']),
+        ),
       },
     );
 
@@ -86,8 +92,10 @@ class TransactionService {
   /// Get today's stats
   Future<Map<String, dynamic>> getTodayStats() async {
     final transactions = await getTodayTransactions();
-    
-    final completedTransactions = transactions.where((t) => t.isCompleted).toList();
+
+    final completedTransactions = transactions
+        .where((t) => t.isCompleted)
+        .toList();
     final totalSales = completedTransactions.fold<double>(
       0,
       (sum, transaction) => sum + transaction.totalAmount,

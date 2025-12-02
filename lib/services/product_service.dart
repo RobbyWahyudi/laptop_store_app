@@ -35,31 +35,23 @@ class ProductService {
     if (page != null) queryParams['page'] = page.toString();
     if (limit != null) queryParams['limit'] = limit.toString();
 
-    print('Making API call with params: $queryParams');
     final response = await _apiService.get(
       ApiConfig.products,
       queryParams: queryParams,
     );
-    print('API Response: $response');
 
     if (response['success'] == true && response['data'] != null) {
       final List<dynamic> data = response['data'];
-      print('Found ${data.length} products in response');
       final products = data.map((json) {
-        print('Processing product: $json');
         // Check if this is a laptop by looking for laptop-specific fields
         if (json['cpu'] != null || json['laptop_categories'] != null) {
-          print('Creating Laptop');
           return Laptop.fromJson(json);
         } else {
-          print('Creating Accessory');
           return Accessory.fromJson(json);
         }
       }).toList();
-      print('Created ${products.length} products');
       return products;
     }
-    print('No products found or API error');
     return [];
   }
 
