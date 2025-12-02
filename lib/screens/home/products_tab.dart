@@ -332,68 +332,75 @@ class _ProductsTabState extends State<ProductsTab> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(product.name, style: Theme.of(context).textTheme.displaySmall),
-            const SizedBox(height: 8),
-            Text(
-              CurrencyFormatter.format(product.price),
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-            _buildInfoRow('Stock', '${product.stock} units'),
-            _buildInfoRow('Category', product.category ?? '-'),
-            _buildInfoRow('Type', product.type.toUpperCase()),
-            if (product is Laptop) ...[
-              const SizedBox(height: 16),
-              const Divider(),
-              const SizedBox(height: 16),
+      builder: (context) => SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(
+            24,
+          ).copyWith(bottom: MediaQuery.of(context).viewInsets.bottom + 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
               Text(
-                'Specifications',
-                style: Theme.of(context).textTheme.titleLarge,
+                product.name,
+                style: Theme.of(context).textTheme.displaySmall,
               ),
-              const SizedBox(height: 12),
-              _buildInfoRow('Brand', product.brand),
-              _buildInfoRow('Processor', product.processor),
-              _buildInfoRow('RAM', '${product.ramGb} GB'),
-              _buildInfoRow('Storage', product.storage),
-              if (product.gpu != null) _buildInfoRow('GPU', product.gpu!),
-            ],
-            const SizedBox(height: 24),
-            Consumer<AuthProvider>(
-              builder: (context, authProvider, child) {
-                return Row(
-                  children: [
-                    if (authProvider.isAdmin) ...[
+              const SizedBox(height: 8),
+              Text(
+                CurrencyFormatter.format(product.price),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildInfoRow('Stock', '${product.stock} units'),
+              _buildInfoRow('Category', product.category ?? '-'),
+              _buildInfoRow('Type', product.type.toUpperCase()),
+              if (product is Laptop) ...[
+                const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 16),
+                Text(
+                  'Specifications',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 12),
+                _buildInfoRow('Brand', product.brand),
+                _buildInfoRow('Processor', product.processor),
+                _buildInfoRow('RAM', '${product.ramGb} GB'),
+                _buildInfoRow('Storage', product.storage),
+                if (product.gpu != null) _buildInfoRow('GPU', product.gpu!),
+              ],
+              const SizedBox(height: 24),
+              Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  return Row(
+                    children: [
+                      if (authProvider.isAdmin) ...[
+                        Expanded(
+                          child: CustomButton(
+                            text: 'Edit Product',
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _navigateToEditProduct(product);
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                      ],
                       Expanded(
                         child: CustomButton(
-                          text: 'Edit Product',
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _navigateToEditProduct(product);
-                          },
+                          text: 'Close',
+                          onPressed: () => Navigator.pop(context),
+                          isOutlined: true,
                         ),
                       ),
-                      const SizedBox(width: 12),
                     ],
-                    Expanded(
-                      child: CustomButton(
-                        text: 'Close',
-                        onPressed: () => Navigator.pop(context),
-                        isOutlined: true,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

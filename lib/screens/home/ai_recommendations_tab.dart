@@ -4,6 +4,7 @@ import '../../config/theme.dart';
 import '../../config/constants.dart';
 import '../../models/product.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/cart_provider.dart';
 import '../../services/ai_service.dart';
 import '../../utils/currency_formatter.dart';
 import '../../widgets/custom_button.dart';
@@ -67,10 +68,13 @@ class _AIRecommendationsTabState extends State<AIRecommendationsTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const SizedBox(height: 12),
           // Title
           Text(
             'AI Laptop Recommendations',
-            style: Theme.of(context).textTheme.displaySmall,
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
@@ -83,6 +87,7 @@ class _AIRecommendationsTabState extends State<AIRecommendationsTab> {
 
           // Use Case Selection
           Card(
+            margin: const EdgeInsets.symmetric(horizontal: 0),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -123,6 +128,7 @@ class _AIRecommendationsTabState extends State<AIRecommendationsTab> {
 
           // Budget Range
           Card(
+            margin: const EdgeInsets.symmetric(horizontal: 0),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -188,7 +194,7 @@ class _AIRecommendationsTabState extends State<AIRecommendationsTab> {
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
           // Get Recommendations Button
           CustomButton(
@@ -197,7 +203,7 @@ class _AIRecommendationsTabState extends State<AIRecommendationsTab> {
             isLoading: _isLoading,
             icon: Icons.psychology,
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
           // Results
           if (_isLoading)
@@ -274,10 +280,27 @@ class _AIRecommendationsTabState extends State<AIRecommendationsTab> {
                     ),
                   ],
                 ),
-                OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.info_outline, size: 18),
-                  label: const Text('Details'),
+                Row(
+                  children: [
+                    IconButton(
+                      padding: const EdgeInsets.only(top: 10),
+                      onPressed: () {
+                        // Add to cart functionality
+                        Provider.of<CartProvider>(
+                          context,
+                          listen: false,
+                        ).addItem(laptop);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${laptop.name} added to cart'),
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.add_shopping_cart),
+                      tooltip: 'Add to Cart',
+                    ),
+                  ],
                 ),
               ],
             ),

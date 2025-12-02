@@ -188,200 +188,102 @@ class _ProductFormState extends State<ProductForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Error message
-            if (widget.error != null) ...[
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppTheme.grey100,
-                  border: Border.all(color: AppTheme.grey300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.error_outline, color: Colors.red),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        widget.error!,
-                        style: const TextStyle(color: Colors.red),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(
+            16,
+          ).copyWith(bottom: MediaQuery.of(context).viewInsets.bottom + 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Error message
+              if (widget.error != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.grey100,
+                    border: Border.all(color: AppTheme.grey300),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline, color: Colors.red),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          widget.error!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // Product Type Selector
-            const Text(
-              'Product Type',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                ChoiceChip(
-                  label: const Text('Laptop'),
-                  selected: _productType == 'laptop',
-                  onSelected: (selected) {
-                    if (selected) {
-                      setState(() => _productType = 'laptop');
-                    }
-                  },
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('Accessory'),
-                  selected: _productType == 'accessory',
-                  onSelected: (selected) {
-                    if (selected) {
-                      setState(() => _productType = 'accessory');
-                    }
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Common Fields
-            CustomTextField(
-              label: 'Product Name',
-              controller: _nameController,
-              prefixIcon: Icons.laptop_mac,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter product name';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-
-            CustomTextField(
-              label: 'Description',
-              controller: _descriptionController,
-              prefixIcon: Icons.description_outlined,
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-
-            Row(
-              children: [
-                Expanded(
-                  child: CustomTextField(
-                    label: 'Price',
-                    controller: _priceController,
-                    prefixIcon: Icons.attach_money,
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter price';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Please enter a valid number';
-                      }
-                      return null;
-                    },
+                    ],
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: CustomTextField(
-                    label: 'Stock',
-                    controller: _stockController,
-                    prefixIcon: Icons.inventory_outlined,
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter stock';
-                      }
-                      if (int.tryParse(value) == null) {
-                        return 'Please enter a valid number';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
+                const SizedBox(height: 16),
               ],
-            ),
-            const SizedBox(height: 16),
 
-            CustomTextField(
-              label: 'Category',
-              controller: _categoryController,
-              prefixIcon: Icons.category_outlined,
-            ),
-            const SizedBox(height: 24),
-
-            // Type-specific fields
-            if (_productType == 'laptop') ...[
+              // Product Type Selector
               const Text(
-                'Laptop Specifications',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                'Product Type',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  ChoiceChip(
+                    label: const Text('Laptop'),
+                    selected: _productType == 'laptop',
+                    onSelected: (selected) {
+                      if (selected) {
+                        setState(() => _productType = 'laptop');
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('Accessory'),
+                    selected: _productType == 'accessory',
+                    onSelected: (selected) {
+                      if (selected) {
+                        setState(() => _productType = 'accessory');
+                      }
+                    },
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
 
+              // Common Fields
               CustomTextField(
-                label: 'Brand',
-                controller: _brandController,
-                prefixIcon: Icons.branding_watermark_outlined,
+                label: 'Product Name',
+                controller: _nameController,
+                prefixIcon: Icons.laptop_mac,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter brand';
+                    return 'Please enter product name';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
 
-              CustomTextField(
-                label: 'Processor',
-                controller: _processorController,
-                prefixIcon: Icons.memory_outlined,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter processor';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
+              // CustomTextField(
+              //   label: 'Description',
+              //   controller: _descriptionController,
+              //   prefixIcon: Icons.description_outlined,
+              //   maxLines: 3,
+              // ),
+              // const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      label: 'RAM (GB)',
-                      controller: _ramController,
-                      prefixIcon: Icons.sd_card_outlined,
+                      label: 'Price',
+                      controller: _priceController,
+                      prefixIcon: Icons.attach_money,
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter RAM';
-                        }
-                        if (int.tryParse(value) == null) {
-                          return 'Please enter a valid number';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: CustomTextField(
-                      label: 'Screen Size (inch)',
-                      controller: _screenSizeController,
-                      prefixIcon: Icons.monitor_outlined,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter screen size';
+                          return 'Please enter price';
                         }
                         if (double.tryParse(value) == null) {
                           return 'Please enter a valid number';
@@ -390,54 +292,22 @@ class _ProductFormState extends State<ProductForm> {
                       },
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                label: 'Storage',
-                controller: _storageController,
-                prefixIcon: Icons.storage_outlined,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter storage';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                label: 'GPU (optional)',
-                controller: _gpuController,
-                prefixIcon: Icons.view_in_ar_outlined,
-              ),
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                label: 'Screen Resolution (optional)',
-                controller: _screenResolutionController,
-                prefixIcon: Icons.hd_outlined,
-              ),
-              const SizedBox(height: 16),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField(
-                      label: 'Refresh Rate (Hz, optional)',
-                      controller: _refreshRateController,
-                      prefixIcon: Icons.refresh_outlined,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: CustomTextField(
-                      label: 'Weight (kg, optional)',
-                      controller: _weightController,
-                      prefixIcon: Icons.fitness_center_outlined,
+                      label: 'Stock',
+                      controller: _stockController,
+                      prefixIcon: Icons.inventory_outlined,
                       keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter stock';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return 'Please enter a valid number';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                 ],
@@ -445,39 +315,140 @@ class _ProductFormState extends State<ProductForm> {
               const SizedBox(height: 16),
 
               CustomTextField(
-                label: 'Operating System (optional)',
-                controller: _osController,
-                prefixIcon: Icons.computer_outlined,
-              ),
-            ] else ...[
-              const Text(
-                'Accessory Details',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                label: 'Accessory Type',
-                controller: _accessoryTypeController,
+                label: 'Category',
+                controller: _categoryController,
                 prefixIcon: Icons.category_outlined,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter accessory type';
-                  }
-                  return null;
-                },
+              ),
+              const SizedBox(height: 24),
+
+              // Type-specific fields
+              if (_productType == 'laptop') ...[
+                const Text(
+                  'Laptop Specifications',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+
+                CustomTextField(
+                  label: 'Brand',
+                  controller: _brandController,
+                  prefixIcon: Icons.branding_watermark_outlined,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter brand';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                CustomTextField(
+                  label: 'Processor',
+                  controller: _processorController,
+                  prefixIcon: Icons.memory_outlined,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter processor';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextField(
+                        label: 'RAM (GB)',
+                        controller: _ramController,
+                        prefixIcon: Icons.sd_card_outlined,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter RAM';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return 'Please enter a valid number';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: CustomTextField(
+                        label: 'Storage',
+                        controller: _storageController,
+                        prefixIcon: Icons.storage_outlined,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter storage';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                CustomTextField(
+                  label: 'GPU (optional)',
+                  controller: _gpuController,
+                  prefixIcon: Icons.view_in_ar_outlined,
+                ),
+                const SizedBox(height: 16),
+
+                CustomTextField(
+                  label: 'Screen Resolution (optional)',
+                  controller: _screenResolutionController,
+                  prefixIcon: Icons.hd_outlined,
+                ),
+                const SizedBox(height: 16),
+
+                CustomTextField(
+                  label: 'Weight (kg, optional)',
+                  controller: _weightController,
+                  prefixIcon: Icons.fitness_center_outlined,
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 16),
+
+                CustomTextField(
+                  label: 'Operating System (optional)',
+                  controller: _osController,
+                  prefixIcon: Icons.computer_outlined,
+                ),
+              ] else ...[
+                const Text(
+                  'Accessory Details',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+
+                CustomTextField(
+                  label: 'Accessory Type',
+                  controller: _accessoryTypeController,
+                  prefixIcon: Icons.category_outlined,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter accessory type';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+
+              const SizedBox(height: 32),
+
+              // Submit Button
+              CustomButton(
+                text: widget.product == null ? 'Add Product' : 'Update Product',
+                onPressed: widget.isLoading ? null : _submitForm,
+                isLoading: widget.isLoading,
               ),
             ],
-
-            const SizedBox(height: 32),
-
-            // Submit Button
-            CustomButton(
-              text: widget.product == null ? 'Add Product' : 'Update Product',
-              onPressed: widget.isLoading ? null : _submitForm,
-              isLoading: widget.isLoading,
-            ),
-          ],
+          ),
         ),
       ),
     );

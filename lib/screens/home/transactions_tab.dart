@@ -98,9 +98,11 @@ class _TransactionsTabState extends State<TransactionsTab> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Products',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   ElevatedButton.icon(
                     onPressed: _openCart,
@@ -227,6 +229,7 @@ class _TransactionsTabState extends State<TransactionsTab> {
 
   Widget _buildProductCard(Product product) {
     return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 0),
       child: InkWell(
         onTap: () {
           Provider.of<CartProvider>(context, listen: false).addItem(product);

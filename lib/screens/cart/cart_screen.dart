@@ -111,164 +111,170 @@ class _CartScreenState extends State<CartScreen> {
             onPressed: () => Navigator.pop(context),
           ),
         ),
-        body: Consumer<CartProvider>(
-          builder: (context, cart, _) {
-            return Column(
-              children: [
-                // Customer Info
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppTheme.grey50,
-                    border: Border(bottom: BorderSide(color: AppTheme.grey200)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Customer Information',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _customerNameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Customer Name',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.person),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Payment Method',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        initialValue: _selectedPaymentMethod,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                        ),
-                        items: [
-                          DropdownMenuItem(
-                            value: AppConstants.paymentCash,
-                            child: Row(
-                              children: const [
-                                Icon(Icons.money, size: 20),
-                                SizedBox(width: 8),
-                                Text('Cash'),
-                              ],
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: AppConstants.paymentQris,
-                            child: Row(
-                              children: const [
-                                Icon(Icons.qr_code, size: 20),
-                                SizedBox(width: 8),
-                                Text('QRIS'),
-                              ],
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: AppConstants.paymentTransfer,
-                            child: Row(
-                              children: const [
-                                Icon(Icons.account_balance, size: 20),
-                                SizedBox(width: 8),
-                                Text('Transfer'),
-                              ],
-                            ),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() => _selectedPaymentMethod = value);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Cart Items
-                Expanded(
-                  child: cart.isEmpty
-                      ? const EmptyState(
-                          icon: Icons.shopping_cart_outlined,
-                          title: 'Cart Empty',
-                          subtitle: 'Your cart is empty',
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: cart.items.length,
-                          itemBuilder: (context, index) {
-                            final item = cart.items[index];
-                            return _buildCartItem(item, cart);
-                          },
-                        ),
-                ),
-
-                // Total & Checkout
-                if (cart.isNotEmpty) ...[
+        body: SafeArea(
+          child: Consumer<CartProvider>(
+            builder: (context, cart, _) {
+              return Column(
+                children: [
+                  // Customer Info
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppTheme.white,
-                      border: Border(top: BorderSide(color: AppTheme.grey200)),
+                      color: AppTheme.grey50,
+                      border: Border(
+                        bottom: BorderSide(color: AppTheme.grey200),
+                      ),
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Total',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              CurrencyFormatter.format(cart.total),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: CustomButton(
-                            text: 'Process Transaction',
-                            onPressed: _processTransaction,
-                            icon: Icons.check_circle,
+                        const Text(
+                          'Customer Information',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        SizedBox(
-                          width: double.infinity,
-                          child: CustomButton(
-                            text: 'Continue Shopping',
-                            onPressed: () => Navigator.pop(context),
-                            isOutlined: true,
+                        TextField(
+                          controller: _customerNameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Customer Name',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.person),
                           ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Payment Method',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          initialValue: _selectedPaymentMethod,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                          items: [
+                            DropdownMenuItem(
+                              value: AppConstants.paymentCash,
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.money, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('Cash'),
+                                ],
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: AppConstants.paymentQris,
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.qr_code, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('QRIS'),
+                                ],
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: AppConstants.paymentTransfer,
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.account_balance, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('Transfer'),
+                                ],
+                              ),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() => _selectedPaymentMethod = value);
+                            }
+                          },
                         ),
                       ],
                     ),
                   ),
+
+                  // Cart Items
+                  Expanded(
+                    child: cart.isEmpty
+                        ? const EmptyState(
+                            icon: Icons.shopping_cart_outlined,
+                            title: 'Cart Empty',
+                            subtitle: 'Your cart is empty',
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: cart.items.length,
+                            itemBuilder: (context, index) {
+                              final item = cart.items[index];
+                              return _buildCartItem(item, cart);
+                            },
+                          ),
+                  ),
+
+                  // Total & Checkout
+                  if (cart.isNotEmpty) ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppTheme.white,
+                        border: Border(
+                          top: BorderSide(color: AppTheme.grey200),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Total',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                CurrencyFormatter.format(cart.total),
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: CustomButton(
+                              text: 'Process Transaction',
+                              onPressed: _processTransaction,
+                              icon: Icons.check_circle,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: double.infinity,
+                            child: CustomButton(
+                              text: 'Continue Shopping',
+                              onPressed: () => Navigator.pop(context),
+                              isOutlined: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
-              ],
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
