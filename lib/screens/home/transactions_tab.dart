@@ -21,6 +21,7 @@ class _TransactionsTabState extends State<TransactionsTab> {
   List<Product> _products = [];
   bool _isLoading = false;
   final TextEditingController _searchController = TextEditingController();
+  String _selectedFilter = 'all'; // all, laptop, accessory
 
   @override
   void initState() {
@@ -41,7 +42,20 @@ class _TransactionsTabState extends State<TransactionsTab> {
   Future<void> _loadProducts() async {
     setState(() => _isLoading = true);
     try {
-      final products = await _productService.getProducts();
+      List<Product> products;
+
+      switch (_selectedFilter) {
+        case 'laptop':
+          products = await _productService.getLaptops();
+          break;
+        case 'accessory':
+          products = await _productService.getAccessories();
+          break;
+        default: // 'all'
+          products = await _productService.getProducts();
+          break;
+      }
+
       setState(() {
         _products = products.where((p) => p.stock > 0).toList();
         _isLoading = false;
@@ -96,9 +110,56 @@ class _TransactionsTabState extends State<TransactionsTab> {
                 ],
               ),
             ),
+            // Filter Buttons
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  ChoiceChip(
+                    label: const Text('All'),
+                    selected: _selectedFilter == 'all',
+                    onSelected: (selected) {
+                      if (selected) {
+                        setState(() {
+                          _selectedFilter = 'all';
+                          _loadProducts();
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('Laptops'),
+                    selected: _selectedFilter == 'laptop',
+                    onSelected: (selected) {
+                      if (selected) {
+                        setState(() {
+                          _selectedFilter = 'laptop';
+                          _loadProducts();
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('Accessories'),
+                    selected: _selectedFilter == 'accessory',
+                    onSelected: (selected) {
+                      if (selected) {
+                        setState(() {
+                          _selectedFilter = 'accessory';
+                          _loadProducts();
+                        });
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
             // Search Bar
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
                 controller: _searchController,
                 decoration: const InputDecoration(
@@ -108,6 +169,7 @@ class _TransactionsTabState extends State<TransactionsTab> {
                 onChanged: (value) => setState(() {}),
               ),
             ),
+            const SizedBox(height: 16),
             // Products Grid
             Expanded(
               child: _isLoading
@@ -123,7 +185,21 @@ class _TransactionsTabState extends State<TransactionsTab> {
   Widget _buildProductsGrid() {
     final filtered = _products.where((p) {
       final query = _searchController.text.toLowerCase();
-      return p.name.toLowerCase().contains(query);
+
+      // Apply search filter
+      if (query.isNotEmpty && !p.name.toLowerCase().contains(query)) {
+        return false;
+      }
+
+      // Apply type filter
+      switch (_selectedFilter) {
+        case 'laptop':
+          return p.isLaptop;
+        case 'accessory':
+          return !p.isLaptop;
+        default: // 'all'
+          return true;
+      }
     }).toList();
 
     if (filtered.isEmpty) {
