@@ -73,6 +73,7 @@ class Laptop extends Product {
     required super.price,
     required super.stock,
     super.category,
+    super.categoryId, // Add categoryId parameter
     required super.createdAt,
     required super.updatedAt,
     required this.brand,
@@ -86,14 +87,29 @@ class Laptop extends Product {
   }) : super(type: 'laptop');
 
   factory Laptop.fromJson(Map<String, dynamic> json) {
+    // Extract category ID from different possible sources
+    int? categoryId;
+    if (json['laptop_categories'] != null && json['laptop_categories'] is Map) {
+      categoryId = json['laptop_categories']['id'];
+    } else if (json['category_id'] != null) {
+      categoryId = json['category_id'];
+    }
+
+    // Extract category name from different possible sources
+    String? categoryName;
+    if (json['laptop_categories'] != null && json['laptop_categories'] is Map) {
+      categoryName = json['laptop_categories']['name'];
+    } else if (json['category_name'] != null) {
+      categoryName = json['category_name'];
+    }
+
     return Laptop(
       id: json['id'].toString(),
       name: json['name'] ?? '',
       price: (json['price'] ?? 0).toDouble(),
       stock: json['stock'] ?? 0,
-      category: json['laptop_categories'] != null
-          ? json['laptop_categories']['name']
-          : json['category_name'],
+      category: categoryName,
+      categoryId: categoryId,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : DateTime.now(),
@@ -142,22 +158,37 @@ class Accessory extends Product {
     required super.price,
     required super.stock,
     super.category,
+    super.categoryId, // Add categoryId parameter
     required super.createdAt,
     required super.updatedAt,
     required this.accessoryType,
   }) : super(type: 'accessory');
 
   factory Accessory.fromJson(Map<String, dynamic> json) {
+    // Extract category ID from different possible sources
+    int? categoryId;
+    if (json['laptop_categories'] != null && json['laptop_categories'] is Map) {
+      categoryId = json['laptop_categories']['id'];
+    } else if (json['category_id'] != null) {
+      categoryId = json['category_id'];
+    }
+
+    // Extract category name from different possible sources
+    String? categoryName;
+    if (json['category'] != null) {
+      categoryName = json['category'];
+    } else if (json['laptop_categories'] != null &&
+        json['laptop_categories'] is Map) {
+      categoryName = json['laptop_categories']['name'];
+    }
+
     return Accessory(
       id: json['id'].toString(),
       name: json['name'] ?? '',
       price: (json['price'] ?? 0).toDouble(),
       stock: json['stock'] ?? 0,
-      category:
-          json['category'] ??
-          (json['laptop_categories'] != null
-              ? json['laptop_categories']['name']
-              : null),
+      category: categoryName,
+      categoryId: categoryId,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : DateTime.now(),

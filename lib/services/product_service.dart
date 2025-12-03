@@ -187,13 +187,8 @@ class ProductService {
     try {
       final response = await _apiService.get(ApiConfig.categories);
 
-      // Log the raw response for debugging
-      print('Raw categories response: $response');
-      print('Response type: ${response.runtimeType}');
-
       // Handle direct array response (if API returns array directly)
       if (response is List) {
-        print('Parsing direct array response');
         final List<dynamic> categoriesList = response as List;
         return categoriesList
             .map((item) => Category.fromJson(item as Map<String, dynamic>))
@@ -202,7 +197,6 @@ class ProductService {
 
       // Handle wrapped response (with success/data fields)
       // At this point, response must be a Map if it's not a List
-      print('Parsing wrapped response');
       if (response['success'] == true && response['data'] != null) {
         final List<dynamic> data = response['data'] as List;
         return data
@@ -217,12 +211,8 @@ class ProductService {
             .map((json) => Category.fromJson(json as Map<String, dynamic>))
             .toList();
       }
-
-      // If response is a map but doesn't match expected formats
-      print('Unexpected response format: $response');
-    } catch (e, stackTrace) {
-      print('Error loading categories: $e');
-      print('Stack trace: $stackTrace');
+    } catch (e) {
+      // Handle error silently
     }
     return [];
   }

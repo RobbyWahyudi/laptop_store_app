@@ -26,7 +26,6 @@ class Category {
           ? DateTime.parse(json['updated_at'])
           : DateTime.now(),
     );
-    print('Parsed category: ${category.name} (ID: ${category.id})');
     return category;
   }
 

@@ -65,8 +65,8 @@ class _ProductFormState extends State<ProductForm> {
       text: widget.product != null ? widget.product!.stock.toString() : '',
     );
     // Set selected category ID if product exists
-    if (widget.product != null) {
-      // We'll set this when we load categories
+    if (widget.product != null && widget.product!.categoryId != null) {
+      _selectedCategoryId = widget.product!.categoryId;
     }
 
     // Initialize laptop controllers
@@ -142,25 +142,48 @@ class _ProductFormState extends State<ProductForm> {
     if (widget.token == null) return;
 
     try {
-      print('Loading categories with token: ${widget.token}');
       final productService = ProductService(widget.token!);
       final categories = await productService.getCategories();
-      print('Loaded ${categories.length} categories');
 
       if (mounted) {
         setState(() {
           _categories = categories;
-          print('Categories updated in state. Count: ${_categories.length}');
 
           // Set selected category if editing existing product
-          if (widget.product != null && widget.product!.categoryId != null) {
-            _selectedCategoryId = widget.product!.categoryId;
-            print('Selected category ID set to: $_selectedCategoryId');
+          // Only set if _selectedCategoryId hasn't been set yet or if it's null
+          if (widget.product != null && _selectedCategoryId == null) {
+            if (widget.product!.categoryId != null) {
+              _selectedCategoryId = widget.product!.categoryId;
+            } else if (widget.product!.category != null) {
+              // If categoryId is null but category name is available, find matching category ID
+              final matchingCategory = _categories.firstWhere(
+                (category) =>
+                    category.name.toLowerCase() ==
+                    widget.product!.category!.toLowerCase(),
+                orElse: () => Category(
+                  id: -1,
+                  name: '',
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                ),
+              );
+              if (matchingCategory.id != -1) {
+                _selectedCategoryId = matchingCategory.id;
+              }
+            }
+          }
+
+          // Validate that the selected category ID exists in the loaded categories
+          // If not, reset the selection to prevent UI issues
+          if (_selectedCategoryId != null &&
+              !_categories.any(
+                (category) => category.id == _selectedCategoryId,
+              )) {
+            _selectedCategoryId = null;
           }
         });
       }
     } catch (e) {
-      print('Error loading categories: $e');
       // Handle error silently or show a message
       if (mounted) {
         // Optionally show error message
@@ -333,37 +356,51 @@ class _ProductFormState extends State<ProductForm> {
               const SizedBox(height: 16),
 
               // Category Dropdown
-              if (_categories.isEmpty)
-                const Text(
-                  'Loading categories...',
-                  style: TextStyle(color: Colors.grey),
-                )
-              else
-                DropdownButtonFormField<int?>(
-                  initialValue: _selectedCategoryId,
-                  decoration: const InputDecoration(
-                    labelText: 'Category',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.category_outlined),
-                  ),
-                  items: _categories.map((category) {
-                    return DropdownMenuItem(
-                      value: category.id,
-                      child: Text(category.name),
+              Builder(
+                builder: (context) {
+                  if (_categories.isEmpty && widget.token != null) {
+                    return const Text(
+                      'Loading categories...',
+                      style: TextStyle(color: Colors.grey),
                     );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedCategoryId = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select a category';
-                    }
-                    return null;
-                  },
-                ),
+                  } else {
+                    return DropdownButtonFormField<int?>(
+                      value:
+                          _selectedCategoryId != null &&
+                              _categories.any(
+                                (category) =>
+                                    category.id == _selectedCategoryId,
+                              )
+                          ? _selectedCategoryId
+                          : null,
+                      decoration: const InputDecoration(
+                        labelText: 'Category',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.category_outlined),
+                      ),
+                      items: _categories.map((category) {
+                        return DropdownMenuItem(
+                          value: category.id,
+                          child: Text(category.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategoryId = value;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Please select a category';
+                        }
+                        return null;
+                      },
+                      // Handle case where selected value doesn't match any items
+                      hint: const Text('Select a category'),
+                    );
+                  }
+                },
+              ),
               const SizedBox(height: 24),
 
               // Type-specific fields
@@ -464,27 +501,9 @@ class _ProductFormState extends State<ProductForm> {
                   controller: _osController,
                   prefixIcon: Icons.computer_outlined,
                 ),
-              ] else ...[
-                const Text(
-                  'Accessory Details',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
                 const SizedBox(height: 16),
-
-                CustomTextField(
-                  label: 'Accessory Type',
-                  controller: _accessoryTypeController,
-                  prefixIcon: Icons.category_outlined,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter accessory type';
-                    }
-                    return null;
-                  },
-                ),
-              ],
-
-              const SizedBox(height: 32),
+              ] else
+                ...[],
 
               // Submit Button
               CustomButton(
