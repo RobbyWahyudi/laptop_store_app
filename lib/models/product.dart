@@ -2,22 +2,22 @@
 class Product {
   final String id;
   final String name;
-  final String? description;
   final String type; // 'laptop' or 'accessory'
   final double price;
   final int stock;
   final String? category;
+  final int? categoryId; // Add category ID
   final DateTime createdAt;
   final DateTime updatedAt;
 
   Product({
     required this.id,
     required this.name,
-    this.description,
     required this.type,
     required this.price,
     required this.stock,
     this.category,
+    this.categoryId, // Add categoryId parameter
     required this.createdAt,
     required this.updatedAt,
   });
@@ -26,11 +26,11 @@ class Product {
     return Product(
       id: json['id'].toString(),
       name: json['name'] ?? '',
-      description: json['description'],
       type: json['type'] ?? 'laptop',
       price: (json['price'] ?? 0).toDouble(),
       stock: json['stock'] ?? 0,
       category: json['category'],
+      categoryId: json['category_id'], // Add categoryId
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );
@@ -40,11 +40,11 @@ class Product {
     return {
       'id': id,
       'name': name,
-      'description': description,
       'type': type,
       'price': price,
       'stock': stock,
       'category': category,
+      'category_id': categoryId, // Add categoryId
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
@@ -63,38 +63,13 @@ class Laptop extends Product {
   final int ramGb;
   final String storage;
   final String? gpu;
-  final double screenSize;
   final String? screenResolution;
-  final String? refreshRate;
   final double? weight;
   final String? operatingSystem;
-
-  // Helper methods to parse display information
-  static double _parseScreenSize(String? display) {
-    if (display == null) return 0.0;
-
-    // Extract screen size from display string (e.g., "15.6" 144Hz" -> 15.6)
-    final RegExp regex = RegExp(r'(\d+\.?\d*)"');
-    final Match? match = regex.firstMatch(display);
-    if (match != null) {
-      return double.tryParse(match.group(1) ?? '0') ?? 0.0;
-    }
-    return 0.0;
-  }
-
-  static String? _parseRefreshRate(String? display) {
-    if (display == null) return null;
-
-    // Extract refresh rate from display string (e.g., "15.6" 144Hz" -> "144Hz")
-    final RegExp regex = RegExp(r'(\d+Hz)');
-    final Match? match = regex.firstMatch(display);
-    return match?.group(1);
-  }
 
   Laptop({
     required super.id,
     required super.name,
-    super.description,
     required super.price,
     required super.stock,
     super.category,
@@ -105,9 +80,7 @@ class Laptop extends Product {
     required this.ramGb,
     required this.storage,
     this.gpu,
-    required this.screenSize,
     this.screenResolution,
-    this.refreshRate,
     this.weight,
     this.operatingSystem,
   }) : super(type: 'laptop');
@@ -116,7 +89,6 @@ class Laptop extends Product {
     return Laptop(
       id: json['id'].toString(),
       name: json['name'] ?? '',
-      description: json['description'],
       price: (json['price'] ?? 0).toDouble(),
       stock: json['stock'] ?? 0,
       category: json['laptop_categories'] != null
@@ -133,9 +105,7 @@ class Laptop extends Product {
       ramGb: json['ram'] ?? 0,
       storage: json['storage'] ?? '',
       gpu: json['gpu'],
-      screenSize: _parseScreenSize(json['display']),
       screenResolution: json['display'],
-      refreshRate: _parseRefreshRate(json['display']),
       weight: json['weight'] != null ? (json['weight']).toDouble() : null,
       operatingSystem: json['os'],
     );
@@ -169,7 +139,6 @@ class Accessory extends Product {
   Accessory({
     required super.id,
     required super.name,
-    super.description,
     required super.price,
     required super.stock,
     super.category,
@@ -182,7 +151,6 @@ class Accessory extends Product {
     return Accessory(
       id: json['id'].toString(),
       name: json['name'] ?? '',
-      description: json['description'],
       price: (json['price'] ?? 0).toDouble(),
       stock: json['stock'] ?? 0,
       category:

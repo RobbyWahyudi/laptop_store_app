@@ -29,6 +29,7 @@ class ApiConfig {
   // Product Endpoints
   static String get products => '$apiUrl/products';
   static String productById(String id) => '$apiUrl/products/$id';
+  static String get categories => '$apiUrl/categories';
   static String get lowStock => '$apiUrl/products/low-stock';
 
   // Transaction Endpoints

@@ -46,13 +46,13 @@ class _TransactionsTabState extends State<TransactionsTab> {
 
       switch (_selectedFilter) {
         case 'laptop':
-          products = await _productService.getLaptops();
+          products = await _productService.getLaptops(limit: 1000);
           break;
         case 'accessory':
-          products = await _productService.getAccessories();
+          products = await _productService.getAccessories(limit: 1000);
           break;
         default: // 'all'
-          products = await _productService.getProducts();
+          products = await _productService.getProducts(limit: 1000);
           break;
       }
 

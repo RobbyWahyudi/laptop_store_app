@@ -264,7 +264,7 @@ class _AIRecommendationsTabState extends State<AIRecommendationsTab> {
             _buildSpec('RAM', '${laptop.ramGb} GB'),
             _buildSpec('Storage', laptop.storage),
             if (laptop.gpu != null) _buildSpec('GPU', laptop.gpu!),
-            _buildSpec('Display', '${laptop.screenSize}"'),
+            _buildSpec('Display', '${laptop.screenResolution}"'),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

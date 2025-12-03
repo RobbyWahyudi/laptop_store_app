@@ -53,6 +53,7 @@ class _ProductsTabState extends State<ProductsTab> {
     try {
       final products = await _productService.getProducts(
         type: _selectedType == 'all' ? null : _selectedType,
+        limit: 1000, // Request all products (increase limit)
       );
       setState(() {
         _products = products;

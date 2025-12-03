@@ -37,6 +37,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           return LoadingOverlay(
             isLoading: productProvider.isLoading,
             child: ProductForm(
+              token: authProvider.token, // Pass token
               product: widget.product,
               onSubmit: (data) async {
                 final product = await productProvider.updateProduct(

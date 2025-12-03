@@ -28,6 +28,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           return LoadingOverlay(
             isLoading: productProvider.isLoading,
             child: ProductForm(
+              token: authProvider.token, // Pass token
               onSubmit: (data) async {
                 final product = await productProvider.createProduct(data);
                 if (product != null && mounted) {

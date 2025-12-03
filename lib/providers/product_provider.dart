@@ -34,6 +34,7 @@ class ProductProvider with ChangeNotifier {
         type: type,
         search: search,
         category: category,
+        limit: 1000, // Request all products (increase limit)
       );
       _products = products;
       _error = null;
