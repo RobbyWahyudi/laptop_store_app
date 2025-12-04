@@ -219,8 +219,8 @@ class _TransactionsTabState extends State<TransactionsTab> {
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.75,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
       ),
       itemCount: filtered.length,
       itemBuilder: (context, index) {

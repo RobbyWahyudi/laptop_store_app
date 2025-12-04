@@ -1,5 +1,6 @@
 import '../config/api_config.dart';
 import '../models/analytics.dart';
+import '../models/stock_alert.dart';
 import 'api_service.dart';
 
 /// Analytics Service
@@ -90,5 +91,15 @@ class AnalyticsService {
       return response['data'];
     }
     return [];
+  }
+
+  /// Get detailed stock alerts
+  Future<StockAlertData> getDetailedStockAlerts() async {
+    final response = await _apiService.get(ApiConfig.stockAlert);
+
+    if (response['success'] == true && response['data'] != null) {
+      return StockAlertData.fromJson(response['data']);
+    }
+    throw Exception('Failed to load stock alerts');
   }
 }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../models/analytics.dart';
 import '../../providers/auth_provider.dart';
+import '../../screens/home/low_stock_screen.dart';
 import '../../services/analytics_service.dart';
 import '../../utils/currency_formatter.dart';
 import '../../widgets/stat_card.dart';
@@ -62,6 +63,18 @@ class _DashboardTabState extends State<DashboardTab> {
         _error = e.toString().replaceAll('Exception: ', '');
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _openLowStockScreen() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.token != null) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LowStockScreen(token: authProvider.token!),
+        ),
+      );
     }
   }
 
@@ -149,13 +162,16 @@ class _DashboardTabState extends State<DashboardTab> {
                   icon: Icons.receipt_long,
                   iconColor: AppTheme.grey700,
                 ),
-                StatCard(
-                  title: 'Low Stock Items',
-                  value: _stats!.lowStock.totalAlerts.toString(),
-                  icon: Icons.warning_amber,
-                  iconColor: _stats!.lowStock.totalAlerts > 0
-                      ? AppTheme.grey800
-                      : AppTheme.grey500,
+                GestureDetector(
+                  onTap: _openLowStockScreen,
+                  child: StatCard(
+                    title: 'Low Stock Items',
+                    value: _stats!.lowStock.totalAlerts.toString(),
+                    icon: Icons.warning_amber,
+                    iconColor: _stats!.lowStock.totalAlerts > 0
+                        ? AppTheme.grey800
+                        : AppTheme.grey500,
+                  ),
                 ),
                 StatCard(
                   title: 'Monthly Revenue',

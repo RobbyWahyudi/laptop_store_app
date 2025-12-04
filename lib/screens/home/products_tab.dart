@@ -221,7 +221,7 @@ class _ProductsTabState extends State<ProductsTab> {
 
   Widget _buildProductCard(Product product) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
         onTap: () => _showProductDetails(product),
         borderRadius: BorderRadius.circular(12),
