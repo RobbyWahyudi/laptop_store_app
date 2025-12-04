@@ -101,7 +101,7 @@ class ProductProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> deleteProduct(String id) async {
+  Future<bool> deleteProduct(String id, String type) async {
     if (_productService == null) return false;
 
     _isLoading = true;
@@ -109,13 +109,14 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      await _productService!.deleteProduct(id);
+      await _productService!.deleteProduct(id, type);
 
       // Remove from list
       _products.removeWhere((p) => p.id == id);
 
       _error = null;
       notifyListeners();
+
       return true;
     } catch (e) {
       _error = e.toString();

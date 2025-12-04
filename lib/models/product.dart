@@ -150,7 +150,7 @@ class Laptop extends Product {
 
 /// Accessory Model
 class Accessory extends Product {
-  final String accessoryType;
+  // Removed accessoryType field
 
   Accessory({
     required super.id,
@@ -161,7 +161,7 @@ class Accessory extends Product {
     super.categoryId, // Add categoryId parameter
     required super.createdAt,
     required super.updatedAt,
-    required this.accessoryType,
+    // Removed accessoryType parameter
   }) : super(type: 'accessory');
 
   factory Accessory.fromJson(Map<String, dynamic> json) {
@@ -195,14 +195,14 @@ class Accessory extends Product {
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'])
           : DateTime.now(),
-      accessoryType: json['accessory_type'] ?? '',
+      // Removed accessoryType assignment
     );
   }
 
   @override
   Map<String, dynamic> toJson() {
     final json = super.toJson();
-    json['accessory_type'] = accessoryType;
+    // Removed accessory_type from json
     return json;
   }
 }

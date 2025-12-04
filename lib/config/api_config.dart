@@ -11,7 +11,7 @@ class ApiConfig {
     } else if (Platform.isAndroid) {
       // Android Emulator: use 10.0.2.2 to access host machine
       // For physical device, replace with your PC's IP (e.g., 'http://192.168.1.100:3000')
-      return 'http://192.168.174.130:3000';
+      return 'http://10.60.154.130:3000';
     } else {
       // iOS, Windows, macOS, Linux: use localhost
       return 'http://localhost:3000';

@@ -134,21 +134,29 @@ class ProductService {
 
   /// Create product
   Future<Product> createProduct(Map<String, dynamic> productData) async {
-    final response = await _apiService.post(
-      ApiConfig.products,
-      body: productData,
-    );
+    try {
+      print('Creating product with data: $productData');
+      final response = await _apiService.post(
+        ApiConfig.products,
+        body: productData,
+      );
+      print('Create product response: $response');
 
-    if (response['success'] == true && response['data'] != null) {
-      final json = response['data'];
-      // Check if this is a laptop by looking for laptop-specific fields
-      if (json['cpu'] != null || json['laptop_categories'] != null) {
-        return Laptop.fromJson(json);
-      } else {
-        return Accessory.fromJson(json);
+      if (response['success'] == true && response['data'] != null) {
+        final json = response['data'];
+        print('Created product data: $json');
+        // Check if this is a laptop by looking for laptop-specific fields
+        if (json['cpu'] != null || json['laptop_categories'] != null) {
+          return Laptop.fromJson(json);
+        } else {
+          return Accessory.fromJson(json);
+        }
       }
+      throw Exception(response['message'] ?? 'Failed to create product');
+    } catch (e) {
+      print('Error creating product with data $productData: $e');
+      rethrow;
     }
-    throw Exception(response['message'] ?? 'Failed to create product');
   }
 
   /// Update product
@@ -156,29 +164,48 @@ class ProductService {
     String id,
     Map<String, dynamic> productData,
   ) async {
-    final response = await _apiService.put(
-      ApiConfig.productById(id),
-      body: productData,
-    );
+    try {
+      final response = await _apiService.put(
+        ApiConfig.productById(id),
+        body: productData,
+      );
 
-    if (response['success'] == true && response['data'] != null) {
-      final json = response['data'];
-      // Check if this is a laptop by looking for laptop-specific fields
-      if (json['cpu'] != null || json['laptop_categories'] != null) {
-        return Laptop.fromJson(json);
-      } else {
-        return Accessory.fromJson(json);
+      if (response['success'] == true && response['data'] != null) {
+        final json = response['data'];
+        // Check if this is a laptop by looking for laptop-specific fields
+        if (json['cpu'] != null || json['laptop_categories'] != null) {
+          return Laptop.fromJson(json);
+        } else {
+          return Accessory.fromJson(json);
+        }
       }
+      throw Exception(response['message'] ?? 'Failed to update product');
+    } catch (e) {
+      print('Error updating product: $e');
+      rethrow;
     }
-    throw Exception(response['message'] ?? 'Failed to update product');
   }
 
   /// Delete product
-  Future<void> deleteProduct(String id) async {
-    final response = await _apiService.delete(ApiConfig.productById(id));
+  Future<void> deleteProduct(String id, String type) async {
+    try {
+      print('Attempting to delete product with ID: $id and type: $type');
+      final url = ApiConfig.productById(id);
+      print('DELETE URL: $url');
 
-    if (response['success'] != true) {
-      throw Exception(response['message'] ?? 'Failed to delete product');
+      // Add type parameter to query params
+      final queryParams = <String, String>{'type': type};
+      print('DELETE Query params: $queryParams');
+
+      final response = await _apiService.delete(url, queryParams: queryParams);
+      print('DELETE response: $response');
+
+      if (response['success'] != true) {
+        throw Exception(response['message'] ?? 'Failed to delete product');
+      }
+    } catch (e) {
+      print('Error deleting product with ID $id and type $type: $e');
+      rethrow;
     }
   }
 

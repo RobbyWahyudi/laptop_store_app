@@ -83,8 +83,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Product'),
-        content: const Text(
-          'Are you sure you want to delete this product? This action cannot be undone.',
+        content: Text(
+          'Are you sure you want to delete "${widget.product.name}" (${widget.product.type})? This action cannot be undone.',
         ),
         actions: [
           TextButton(
@@ -100,7 +100,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
     );
 
     if (confirm == true) {
-      final success = await productProvider.deleteProduct(widget.product.id);
+      // Pass both the ID and the type of the product to delete
+      final success = await productProvider.deleteProduct(
+        widget.product.id,
+        widget.product.type,
+      );
       if (success && mounted) {
         // Store context in local variable before async gap
         final scaffoldContext = context;
@@ -119,7 +123,23 @@ class _EditProductScreenState extends State<EditProductScreen> {
         if (scaffoldContext.mounted) {
           Navigator.pop(scaffoldContext, true);
         }
+      } else if (!success) {
+        // Show error message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to delete product: ${productProvider.error}',
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
+    } else {
+      print(
+        'User cancelled deletion of product ID: ${widget.product.id}',
+      ); // Removed redundant print statement
     }
   }
 }

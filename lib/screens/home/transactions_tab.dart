@@ -112,10 +112,13 @@ class _TransactionsTabState extends State<TransactionsTab> {
                 ],
               ),
             ),
+            const SizedBox(height: 16),
             // Filter Buttons
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                // crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   ChoiceChip(
                     label: const Text('All'),

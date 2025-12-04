@@ -50,7 +50,7 @@ class _ProductFormState extends State<ProductForm> {
   late TextEditingController _osController;
 
   // Accessory specific fields
-  late TextEditingController _accessoryTypeController;
+  late TextEditingController _accessoryCategoryController;
 
   @override
   void initState() {
@@ -100,12 +100,12 @@ class _ProductFormState extends State<ProductForm> {
     // Initialize accessory controller
     if (widget.product is Accessory) {
       final accessory = widget.product as Accessory;
-      _accessoryTypeController = TextEditingController(
-        text: accessory.accessoryType,
+      _accessoryCategoryController = TextEditingController(
+        text: accessory.category ?? '',
       );
       _productType = 'accessory';
     } else {
-      _accessoryTypeController = TextEditingController();
+      _accessoryCategoryController = TextEditingController();
     }
 
     // Load categories if token is available
@@ -132,7 +132,7 @@ class _ProductFormState extends State<ProductForm> {
     _osController.dispose();
 
     // Accessory controller
-    _accessoryTypeController.dispose();
+    _accessoryCategoryController.dispose();
 
     super.dispose();
   }
@@ -197,12 +197,13 @@ class _ProductFormState extends State<ProductForm> {
         'name': _nameController.text,
         'price': double.tryParse(_priceController.text) ?? 0,
         'stock': int.tryParse(_stockController.text) ?? 0,
-        'category_id': _selectedCategoryId,
         'type': _productType,
       };
 
       // Add type-specific fields
       if (_productType == 'laptop') {
+        // For laptops, include category_id
+        data['category_id'] = _selectedCategoryId;
         data.addAll({
           'brand': _brandController.text,
           'cpu': _processorController.text,
@@ -218,7 +219,8 @@ class _ProductFormState extends State<ProductForm> {
           'os': _osController.text.isEmpty ? null : _osController.text,
         });
       } else {
-        data['accessory_type'] = _accessoryTypeController.text;
+        // For accessories, don't include category_id and use category instead of accessory_type
+        data['category'] = _accessoryCategoryController.text;
       }
 
       widget.onSubmit(data);
@@ -355,53 +357,55 @@ class _ProductFormState extends State<ProductForm> {
               ),
               const SizedBox(height: 16),
 
-              // Category Dropdown
-              Builder(
-                builder: (context) {
-                  if (_categories.isEmpty && widget.token != null) {
-                    return const Text(
-                      'Loading categories...',
-                      style: TextStyle(color: Colors.grey),
-                    );
-                  } else {
-                    return DropdownButtonFormField<int?>(
-                      value:
-                          _selectedCategoryId != null &&
-                              _categories.any(
-                                (category) =>
-                                    category.id == _selectedCategoryId,
-                              )
-                          ? _selectedCategoryId
-                          : null,
-                      decoration: const InputDecoration(
-                        labelText: 'Category',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.category_outlined),
-                      ),
-                      items: _categories.map((category) {
-                        return DropdownMenuItem(
-                          value: category.id,
-                          child: Text(category.name),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedCategoryId = value;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please select a category';
-                        }
-                        return null;
-                      },
-                      // Handle case where selected value doesn't match any items
-                      hint: const Text('Select a category'),
-                    );
-                  }
-                },
-              ),
-              const SizedBox(height: 24),
+              // Category Dropdown for Laptops
+              if (_productType == 'laptop') ...[
+                Builder(
+                  builder: (context) {
+                    if (_categories.isEmpty && widget.token != null) {
+                      return const Text(
+                        'Loading categories...',
+                        style: TextStyle(color: Colors.grey),
+                      );
+                    } else {
+                      return DropdownButtonFormField<int?>(
+                        initialValue:
+                            _selectedCategoryId != null &&
+                                _categories.any(
+                                  (category) =>
+                                      category.id == _selectedCategoryId,
+                                )
+                            ? _selectedCategoryId
+                            : null,
+                        decoration: const InputDecoration(
+                          labelText: 'Category',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.category_outlined),
+                        ),
+                        items: _categories.map((category) {
+                          return DropdownMenuItem(
+                            value: category.id,
+                            child: Text(category.name),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCategoryId = value;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Please select a category';
+                          }
+                          return null;
+                        },
+                        // Handle case where selected value doesn't match any items
+                        hint: const Text('Select a category'),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 24),
+              ],
 
               // Type-specific fields
               if (_productType == 'laptop') ...[
@@ -502,8 +506,55 @@ class _ProductFormState extends State<ProductForm> {
                   prefixIcon: Icons.computer_outlined,
                 ),
                 const SizedBox(height: 16),
-              ] else
-                ...[],
+              ] else ...[
+                const Text(
+                  'Accessory Details',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+
+                // Predefined accessory categories dropdown
+                DropdownButtonFormField<String>(
+                  initialValue: _accessoryCategoryController.text.isEmpty
+                      ? null
+                      : _accessoryCategoryController.text,
+                  decoration: const InputDecoration(
+                    labelText: 'Category',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.category_outlined),
+                  ),
+                  items:
+                      const [
+                        'Mouse',
+                        'Keyboard',
+                        'Headset',
+                        'Charger',
+                        'Cooling Pad',
+                        'Storage',
+                      ].map((category) {
+                        return DropdownMenuItem(
+                          value: category.toLowerCase(),
+                          child: Text(category),
+                        );
+                      }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _accessoryCategoryController.text = value;
+                      });
+                    }
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select a category';
+                    }
+                    return null;
+                  },
+                  hint: const Text('Select a category'),
+                ),
+              ],
+
+              const SizedBox(height: 32),
 
               // Submit Button
               CustomButton(
