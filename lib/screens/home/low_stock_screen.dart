@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../config/api_config.dart';
 import '../../config/theme.dart';
 import '../../models/stock_alert.dart';
 import '../../services/analytics_service.dart';
-import '../../services/api_service.dart';
 import '../../utils/currency_formatter.dart';
 import '../../widgets/empty_state.dart';
 
@@ -140,8 +138,7 @@ class _LowStockScreenState extends State<LowStockScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: _stockData!.laptops.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 8),
+                          separatorBuilder: (_, _) => const SizedBox(height: 8),
                           itemBuilder: (context, index) {
                             final laptop = _stockData!.laptops[index];
                             return _buildStockItemCard(laptop, true);
@@ -161,8 +158,7 @@ class _LowStockScreenState extends State<LowStockScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: _stockData!.accessories.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 8),
+                          separatorBuilder: (_, _) => const SizedBox(height: 8),
                           itemBuilder: (context, index) {
                             final accessory = _stockData!.accessories[index];
                             return _buildStockItemCard(accessory, false);
@@ -202,13 +198,13 @@ class _LowStockScreenState extends State<LowStockScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${item.brand}${item.category.isNotEmpty ? ' • ${item.category}' : ''}',
+              '${item.brand}${item.category.isNotEmpty ? ' ${item.category}' : ''}',
             ),
             const SizedBox(height: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: AppTheme.grey800.withOpacity(0.1),
+                color: AppTheme.grey800.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(

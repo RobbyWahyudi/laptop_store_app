@@ -8,6 +8,7 @@ import '../../services/product_service.dart';
 import '../../utils/currency_formatter.dart';
 import '../../widgets/empty_state.dart';
 import '../../screens/cart/cart_screen.dart';
+import '../../screens/transactions/transactions_history_screen.dart';
 
 class TransactionsTab extends StatefulWidget {
   const TransactionsTab({super.key});
@@ -82,13 +83,22 @@ class _TransactionsTabState extends State<TransactionsTab> {
     }
   }
 
+  Future<void> _openTransactionHistory() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const TransactionsHistoryScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<CartProvider>(
       builder: (context, cart, _) {
         return Column(
           children: [
-            // Header with cart button
+            // Header with cart and history buttons
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -104,10 +114,20 @@ class _TransactionsTabState extends State<TransactionsTab> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: _openCart,
-                    icon: const Icon(Icons.shopping_cart),
-                    label: Text('Cart (${cart.itemCount})'),
+                  Row(
+                    children: [
+                      TextButton.icon(
+                        onPressed: _openTransactionHistory,
+                        icon: const Icon(Icons.history),
+                        label: const Text('History'),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        onPressed: _openCart,
+                        icon: const Icon(Icons.shopping_cart),
+                        label: Text('Cart (${cart.itemCount})'),
+                      ),
+                    ],
                   ),
                 ],
               ),

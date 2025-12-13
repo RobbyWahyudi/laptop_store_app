@@ -13,14 +13,14 @@ class TransactionService {
 
   /// Get all transactions
   Future<List<Transaction>> getTransactions({
-    String? status,
-    String? startDate,
-    String? endDate,
+    int page = 1,
+    int limit = 20,
+    String? dateFrom,
   }) async {
     final queryParams = <String, String>{};
-    if (status != null) queryParams['status'] = status;
-    if (startDate != null) queryParams['start_date'] = startDate;
-    if (endDate != null) queryParams['end_date'] = endDate;
+    queryParams['page'] = page.toString();
+    queryParams['limit'] = limit.toString();
+    if (dateFrom != null) queryParams['date_from'] = dateFrom;
 
     final response = await _apiService.get(
       ApiConfig.transactions,
@@ -98,7 +98,7 @@ class TransactionService {
         .toList();
     final totalSales = completedTransactions.fold<double>(
       0,
-      (sum, transaction) => sum + transaction.totalAmount,
+      (sum, transaction) => sum + transaction.totalPrice,
     );
 
     return {

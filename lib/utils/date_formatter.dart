@@ -12,4 +12,12 @@ class DateFormatter {
   static String formatTime(DateTime time) {
     return DateFormat('HH:mm').format(time);
   }
+
+  static String formatForApi(DateTime date) {
+    return DateFormat('yyyy-MM-dd').format(date);
+  }
+
+  static String formatDisplay(DateTime date) {
+    return DateFormat('dd MMM yyyy').format(date);
+  }
 }
