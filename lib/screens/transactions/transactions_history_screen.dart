@@ -20,13 +20,11 @@ class _TransactionsHistoryScreenState extends State<TransactionsHistoryScreen> {
   late TransactionService _transactionService;
   List<Transaction> _transactions = [];
   bool _isLoading = false;
-  bool _isLoadingMore = false;
   int _currentPage = 1;
-  final int _limit = 20;
+  final int _limit = 10;
   DateTime? _selectedDateFrom;
   final TextEditingController _dateController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
-  bool _hasMore = true;
+  bool _hasNextPage = false;
 
   @override
   void initState() {
@@ -36,36 +34,21 @@ class _TransactionsHistoryScreenState extends State<TransactionsHistoryScreen> {
       _transactionService = TransactionService(token);
       _loadTransactions();
     }
-    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _dateController.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent &&
-        !_isLoadingMore &&
-        _hasMore) {
-      _loadTransactions(loadMore: true);
-    }
-  }
-
-  Future<void> _loadTransactions({bool loadMore = false}) async {
-    if (loadMore) {
-      setState(() => _isLoadingMore = true);
-    } else {
-      setState(() => _isLoading = true);
-      _currentPage = 1;
-    }
+  Future<void> _loadTransactions({int? page}) async {
+    setState(() => _isLoading = true);
+    final pageToLoad = page ?? _currentPage;
 
     try {
       final transactions = await _transactionService.getTransactions(
-        page: loadMore ? _currentPage + 1 : 1,
+        page: pageToLoad,
         limit: _limit,
         dateFrom: _selectedDateFrom != null
             ? DateFormatter.formatForApi(_selectedDateFrom!)
@@ -73,26 +56,30 @@ class _TransactionsHistoryScreenState extends State<TransactionsHistoryScreen> {
       );
 
       setState(() {
-        if (loadMore) {
-          _transactions.addAll(transactions);
-          _currentPage++;
-        } else {
-          _transactions = transactions;
-        }
-        _hasMore = transactions.length == _limit;
+        _transactions = transactions;
+        _hasNextPage = transactions.length == _limit;
+        _currentPage = pageToLoad;
         _isLoading = false;
-        _isLoadingMore = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _isLoadingMore = false;
-      });
+      setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error loading transactions: $e')),
         );
       }
+    }
+  }
+
+  void _nextPage() {
+    if (_hasNextPage) {
+      _loadTransactions(page: _currentPage + 1);
+    }
+  }
+
+  void _previousPage() {
+    if (_currentPage > 1) {
+      _loadTransactions(page: _currentPage - 1);
     }
   }
 
@@ -108,7 +95,7 @@ class _TransactionsHistoryScreenState extends State<TransactionsHistoryScreen> {
         _selectedDateFrom = picked;
         _dateController.text = DateFormatter.formatDisplay(picked);
       });
-      _loadTransactions();
+      _loadTransactions(page: 1);
     }
   }
 
@@ -117,49 +104,72 @@ class _TransactionsHistoryScreenState extends State<TransactionsHistoryScreen> {
       _selectedDateFrom = null;
       _dateController.clear();
     });
-    _loadTransactions();
+    _loadTransactions(page: 1);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Transaction History')),
-      body: Column(
-        children: [
-          const SizedBox(height: 16),
-          // Date Filter
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _dateController,
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      hintText: 'Filter by date from...',
-                      prefixIcon: const Icon(Icons.calendar_today),
-                      suffixIcon: _selectedDateFrom != null
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: _clearDateFilter,
-                            )
-                          : null,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            // Date Filter
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _dateController,
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        hintText: 'Filter by date from...',
+                        prefixIcon: const Icon(Icons.calendar_today),
+                        suffixIcon: _selectedDateFrom != null
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: _clearDateFilter,
+                              )
+                            : null,
+                      ),
+                      onTap: _selectDate,
                     ),
-                    onTap: _selectDate,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          // Transactions List
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _buildTransactionsList(),
-          ),
-        ],
+            const SizedBox(height: 16),
+            // Transactions List
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _buildTransactionsList(),
+            ),
+            // Pagination
+            if (!_isLoading && _transactions.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: _currentPage > 1 ? _previousPage : null,
+                      child: const Text('Previous'),
+                    ),
+                    const SizedBox(width: 16),
+                    Text('Page $_currentPage'),
+                    const SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: _hasNextPage ? _nextPage : null,
+                      child: const Text('Next'),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -174,19 +184,9 @@ class _TransactionsHistoryScreenState extends State<TransactionsHistoryScreen> {
     }
 
     return ListView.builder(
-      controller: _scrollController,
       padding: const EdgeInsets.all(16),
-      itemCount: _transactions.length + (_isLoadingMore ? 1 : 0),
+      itemCount: _transactions.length,
       itemBuilder: (context, index) {
-        if (index == _transactions.length) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-
         final transaction = _transactions[index];
         return _buildTransactionCard(transaction);
       },
@@ -195,7 +195,7 @@ class _TransactionsHistoryScreenState extends State<TransactionsHistoryScreen> {
 
   Widget _buildTransactionCard(Transaction transaction) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

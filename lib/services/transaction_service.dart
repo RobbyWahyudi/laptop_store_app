@@ -14,7 +14,7 @@ class TransactionService {
   /// Get all transactions
   Future<List<Transaction>> getTransactions({
     int page = 1,
-    int limit = 20,
+    int limit = 10,
     String? dateFrom,
   }) async {
     final queryParams = <String, String>{};
