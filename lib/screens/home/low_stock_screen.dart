@@ -186,7 +186,7 @@ class _LowStockScreenState extends State<LowStockScreen> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
-            isLaptop ? Icons.laptop_mac : Icons.inventory_2,
+            isLaptop ? Icons.laptop_mac : Icons.headphones,
             color: AppTheme.black,
           ),
         ),

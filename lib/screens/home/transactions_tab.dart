@@ -53,7 +53,10 @@ class _TransactionsTabState extends State<TransactionsTab> {
           products = await _productService.getAccessories(limit: 1000);
           break;
         default: // 'all'
-          products = await _productService.getProducts(limit: 1000);
+          products = await _productService.getProducts(
+            type: 'all',
+            limit: 1000,
+          );
           break;
       }
 
@@ -316,7 +319,7 @@ class _TransactionsTabState extends State<TransactionsTab> {
               const SizedBox(height: 12),
               Center(
                 child: Icon(
-                  product.isLaptop ? Icons.laptop_mac : Icons.inventory_2,
+                  product.isLaptop ? Icons.laptop_mac : Icons.headphones,
                   size: 56,
                   color: AppTheme.grey700,
                 ),

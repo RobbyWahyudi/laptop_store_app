@@ -291,7 +291,7 @@ class _CartScreenState extends State<CartScreen> {
             Row(
               children: [
                 Icon(
-                  item.product.isLaptop ? Icons.laptop_mac : Icons.inventory_2,
+                  item.product.isLaptop ? Icons.laptop_mac : Icons.headphones,
                   color: AppTheme.grey700,
                 ),
                 const SizedBox(width: 8),

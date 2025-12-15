@@ -9,6 +9,7 @@ import '../../utils/currency_formatter.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/empty_state.dart';
 import '../../screens/cart/cart_screen.dart';
+import '../../screens/home/best_sellers_screen.dart';
 
 class DashboardTab extends StatefulWidget {
   const DashboardTab({super.key});
@@ -193,7 +194,14 @@ class _DashboardTabState extends State<DashboardTab> {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BestSellersScreen(),
+                      ),
+                    );
+                  },
                   label: const Text('View All'),
                   icon: const Icon(Icons.arrow_forward, size: 16),
                   iconAlignment: IconAlignment.end,
@@ -234,7 +242,7 @@ class _DashboardTabState extends State<DashboardTab> {
           child: Icon(
             product.productType == 'laptop'
                 ? Icons.laptop_mac
-                : Icons.inventory_2,
+                : Icons.headphones,
             color: AppTheme.black,
           ),
         ),

@@ -49,6 +49,23 @@ class AnalyticsService {
     return [];
   }
 
+  /// Get best sellers with type
+  Future<List<TopProduct>> getBestSellersByType({
+    required int limit,
+    required String type,
+  }) async {
+    final response = await _apiService.get(
+      ApiConfig.bestSellers,
+      queryParams: {'limit': limit.toString(), 'type': type},
+    );
+
+    if (response['success'] == true && response['data'] != null) {
+      final List<dynamic> data = response['data'];
+      return data.map((json) => TopProduct.fromJson(json)).toList();
+    }
+    throw Exception('Failed to load best sellers by type');
+  }
+
   /// Get revenue data
   Future<Map<String, dynamic>> getRevenue({String period = 'monthly'}) async {
     final response = await _apiService.get(

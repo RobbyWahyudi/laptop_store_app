@@ -52,7 +52,7 @@ class _ProductsTabState extends State<ProductsTab> {
     setState(() => _isLoading = true);
     try {
       final products = await _productService.getProducts(
-        type: _selectedType == 'all' ? null : _selectedType,
+        type: _selectedType,
         limit: 1000, // Request all products (increase limit)
       );
       setState(() {
@@ -249,7 +249,7 @@ class _ProductsTabState extends State<ProductsTab> {
               Row(
                 children: [
                   Icon(
-                    product.isLaptop ? Icons.laptop_mac : Icons.inventory_2,
+                    product.isLaptop ? Icons.laptop_mac : Icons.headphones,
                     size: 20,
                     color: AppTheme.grey700,
                   ),

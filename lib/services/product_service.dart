@@ -25,8 +25,9 @@ class ProductService {
     int? limit,
   }) async {
     final queryParams = <String, String>{};
-    // Only add type parameter if it's not 'all'
-    if (type != null && type != 'all') queryParams['type'] = type;
+    // Always include the type parameter, even if it is 'all'
+    // This ensures that when type is 'all', we explicitly send 'type=all' to the backend
+    if (type != null) queryParams['type'] = type;
     if (search != null) queryParams['search'] = search;
     if (category != null) queryParams['category'] = category;
     if (brand != null) queryParams['brand'] = brand;

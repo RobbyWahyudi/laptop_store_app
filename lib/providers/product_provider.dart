@@ -31,7 +31,7 @@ class ProductProvider with ChangeNotifier {
 
     try {
       final products = await _productService!.getProducts(
-        type: type,
+        type: type ?? 'all',
         search: search,
         category: category,
         limit: 1000, // Request all products (increase limit)
