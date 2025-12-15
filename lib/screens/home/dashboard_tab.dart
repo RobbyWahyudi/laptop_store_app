@@ -194,8 +194,9 @@ class _DashboardTabState extends State<DashboardTab> {
                 ),
                 TextButton.icon(
                   onPressed: () {},
-                  icon: const Icon(Icons.arrow_forward, size: 16),
                   label: const Text('View All'),
+                  icon: const Icon(Icons.arrow_forward, size: 16),
+                  iconAlignment: IconAlignment.end,
                 ),
               ],
             ),
@@ -221,8 +222,15 @@ class _DashboardTabState extends State<DashboardTab> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: AppTheme.grey100,
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            color: AppTheme.grey100,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          // backgroundColor: AppTheme.grey100,
           child: Icon(
             product.productType == 'laptop'
                 ? Icons.laptop_mac

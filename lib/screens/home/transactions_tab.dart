@@ -98,103 +98,147 @@ class _TransactionsTabState extends State<TransactionsTab> {
       builder: (context, cart, _) {
         return Column(
           children: [
-            // Header with cart and history buttons
+            // Header with cart and history buttons, search, and filters
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(
+                top: 16,
+                left: 16,
+                right: 16,
+                bottom: 12,
+              ),
               decoration: BoxDecoration(
                 color: AppTheme.white,
-                border: Border(bottom: BorderSide(color: AppTheme.grey200)),
+                // border: Border(bottom: BorderSide(color: AppTheme.grey200)),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Products',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextButton.icon(
-                        onPressed: _openTransactionHistory,
-                        icon: const Icon(Icons.history),
-                        label: const Text('History'),
+                      Text(
+                        'Transaksi',
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: _openTransactionHistory,
+                            icon: const Icon(Icons.history),
+                            label: const Text(
+                              'History',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton.icon(
+                            onPressed: _openCart,
+                            icon: const Icon(Icons.shopping_cart),
+                            label: Text(
+                              'Cart (${cart.itemCount})',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      hintText: 'Search products...',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: (value) => setState(() {}),
+                  ),
+                  const SizedBox(height: 12),
+                  // Filter Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ChoiceChip(
+                        label: Text('All'),
+                        selected: _selectedFilter == 'all',
+                        labelStyle: TextStyle(
+                          fontWeight: _selectedFilter == 'all'
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                          color: _selectedFilter == 'all'
+                              ? Colors.white
+                              : AppTheme.grey800,
+                        ),
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() {
+                              _selectedFilter = 'all';
+                              _loadProducts();
+                            });
+                          }
+                        },
                       ),
                       const SizedBox(width: 8),
-                      ElevatedButton.icon(
-                        onPressed: _openCart,
-                        icon: const Icon(Icons.shopping_cart),
-                        label: Text('Cart (${cart.itemCount})'),
+                      ChoiceChip(
+                        label: Text('Laptops'),
+                        selected: _selectedFilter == 'laptop',
+                        labelStyle: TextStyle(
+                          fontWeight: _selectedFilter == 'laptop'
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                          color: _selectedFilter == 'laptop'
+                              ? Colors.white
+                              : AppTheme.grey800,
+                        ),
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() {
+                              _selectedFilter = 'laptop';
+                              _loadProducts();
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: Text('Accessories'),
+                        selected: _selectedFilter == 'accessory',
+                        labelStyle: TextStyle(
+                          fontWeight: _selectedFilter == 'accessory'
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                          color: _selectedFilter == 'accessory'
+                              ? Colors.white
+                              : AppTheme.grey800,
+                        ),
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() {
+                              _selectedFilter = 'accessory';
+                              _loadProducts();
+                            });
+                          }
+                        },
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            // Filter Buttons
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                // crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ChoiceChip(
-                    label: const Text('All'),
-                    selected: _selectedFilter == 'all',
-                    onSelected: (selected) {
-                      if (selected) {
-                        setState(() {
-                          _selectedFilter = 'all';
-                          _loadProducts();
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  ChoiceChip(
-                    label: const Text('Laptops'),
-                    selected: _selectedFilter == 'laptop',
-                    onSelected: (selected) {
-                      if (selected) {
-                        setState(() {
-                          _selectedFilter = 'laptop';
-                          _loadProducts();
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  ChoiceChip(
-                    label: const Text('Accessories'),
-                    selected: _selectedFilter == 'accessory',
-                    onSelected: (selected) {
-                      if (selected) {
-                        setState(() {
-                          _selectedFilter = 'accessory';
-                          _loadProducts();
-                        });
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Search Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TextField(
-                controller: _searchController,
-                decoration: const InputDecoration(
-                  hintText: 'Search products...',
-                  prefixIcon: Icon(Icons.search),
-                ),
-                onChanged: (value) => setState(() {}),
-              ),
-            ),
-            const SizedBox(height: 16),
+            const Divider(height: 1),
+
             // Products Grid
             Expanded(
               child: _isLoading
@@ -238,7 +282,7 @@ class _TransactionsTabState extends State<TransactionsTab> {
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.75,
+        childAspectRatio: 0.9,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),
@@ -269,12 +313,16 @@ class _TransactionsTabState extends State<TransactionsTab> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                product.isLaptop ? Icons.laptop_mac : Icons.inventory_2,
-                size: 48,
-                color: AppTheme.grey700,
+              const SizedBox(height: 12),
+              Center(
+                child: Icon(
+                  product.isLaptop ? Icons.laptop_mac : Icons.inventory_2,
+                  size: 56,
+                  color: AppTheme.grey700,
+                ),
               ),
-              const Spacer(),
+              const SizedBox(height: 12),
+              Spacer(),
               Text(
                 product.name,
                 style: Theme.of(context).textTheme.titleSmall,

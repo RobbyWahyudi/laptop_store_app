@@ -119,10 +119,26 @@ class _ProductsTabState extends State<ProductsTab> {
       body: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.only(
+              top: 16,
+              left: 16,
+              right: 16,
+              bottom: 12,
+            ),
             color: AppTheme.white,
             child: Column(
               children: [
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Text(
+                      'Produk',
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
                 TextField(
                   controller: _searchController,
                   onChanged: _filterProducts,

@@ -96,8 +96,8 @@ class _HomeScreenState extends State<HomeScreen> {
           label: 'Dashboard',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.inventory_outlined),
-          activeIcon: Icon(Icons.inventory),
+          icon: Icon(Icons.inventory_2_outlined),
+          activeIcon: Icon(Icons.inventory_2),
           label: 'Products',
         ),
         BottomNavigationBarItem(
@@ -106,9 +106,9 @@ class _HomeScreenState extends State<HomeScreen> {
           label: 'Transactions',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.psychology_outlined),
-          activeIcon: Icon(Icons.psychology),
-          label: 'AI Recommend',
+          icon: Icon(Icons.assistant_outlined),
+          activeIcon: Icon(Icons.assistant),
+          label: 'Assistant',
         ),
       ];
     } else if (authProvider.isKasir) {
@@ -119,14 +119,14 @@ class _HomeScreenState extends State<HomeScreen> {
           label: 'Cashier',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.inventory_outlined),
-          activeIcon: Icon(Icons.inventory),
+          icon: Icon(Icons.inventory_2_outlined),
+          activeIcon: Icon(Icons.inventory_2),
           label: 'Products',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.psychology_outlined),
-          activeIcon: Icon(Icons.psychology),
-          label: 'AI Recommend',
+          icon: Icon(Icons.assistant_outlined),
+          activeIcon: Icon(Icons.assistant),
+          label: 'Assistant',
         ),
       ];
     } else {

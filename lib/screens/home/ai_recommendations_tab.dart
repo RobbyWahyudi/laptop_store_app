@@ -201,7 +201,6 @@ class _AIRecommendationsTabState extends State<AIRecommendationsTab> {
             text: 'Get Recommendations',
             onPressed: _getRecommendations,
             isLoading: _isLoading,
-            icon: Icons.psychology,
           ),
           const SizedBox(height: 24),
 
